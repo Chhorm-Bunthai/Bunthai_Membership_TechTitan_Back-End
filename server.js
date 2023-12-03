@@ -1,10 +1,9 @@
-const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
 // Load environment variables from .env file
 dotenv.config({ path: "./.env" });
-const app = express();
+const app = require("./src/app");
 
 const port = process.env.PORT || 3000;
 
