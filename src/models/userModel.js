@@ -1,7 +1,8 @@
 // Import required modules
 const mongoose = require("mongoose");
 const validator = require("validator");
-// const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
+
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -49,6 +50,14 @@ const userSchema = new Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+});
+
+// this is for sign up hashing password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
 });
 // Create and export the User model based on the user schema
 module.exports = model("User", userSchema);
