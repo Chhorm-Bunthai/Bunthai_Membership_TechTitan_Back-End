@@ -1,7 +1,7 @@
 // Import required modules
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
