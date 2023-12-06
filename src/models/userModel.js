@@ -61,12 +61,24 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// executed before save
+// let us know when the password has been modified
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// comparing password for logging in the user
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+// this instance method is used to determine whether the user had change the password or not
 userSchema.methods.changedPasswordAfter = function (JWTTimesstamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
@@ -79,6 +91,8 @@ userSchema.methods.changedPasswordAfter = function (JWTTimesstamp) {
   return false;
 };
 
+// reset the token for user to reset their password
+// it's like renew their identity
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
