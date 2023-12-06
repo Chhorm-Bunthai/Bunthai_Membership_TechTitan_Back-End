@@ -46,62 +46,39 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-exports.protect = async (req, res, next) => {
-  // 1) Getting token and check of it's there
-  // console.log(req.headers.authorization)
-  try {
-    let token;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    }
-    if (!token) {
-      return res.status(401).json({
-        status: "fail",
-        message: "You are not loged in! Please login to get access.",
-      });
-    }
-
-    // 2) Verification token
-
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    // console.log(decoded);
-
-    //3) Check if user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      return res.status(401).json({
-        status: "fail",
-        message: "The user belonging to this token does no longer exist.",
-      });
-    }
-    //   4) Check if user changed password after the token was issued
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return res.status(401).json({
-        status: "fail",
-        message: "User recently changed password! Please login again",
-      });
-    }
-    // Grant access to protectede route
-    req.user = currentUser;
-    next();
-  } catch (err) {
-    // console.log(err.name)
-    if (err.name === "TokenExpiredError") {
-      res.status(401).json({
-        status: "fail",
-        message: "Your token has expired! please login again",
-      });
-    } else if (err.name === "JsonWebTokenError") {
-      res.status(401).json({
-        status: "fail",
-        message: `Invalid token. Please log in again!`,
-      });
-    }
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Getting token and check if it's exist
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
   }
-};
+  if (!token) {
+    return next(new AppError("You are not log in! Please log in!!!"));
+  }
+
+  // 2) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // 3) Check if user still exists
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError("The user belonging to this token is no longer exist", 401)
+    );
+  }
+
+  // 4) Check if user changed password after the token was issued
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError("User recently changed password", 401));
+  }
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+  next();
+});
 
 exports.restricTo =
   (...roles) =>
@@ -168,6 +145,22 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
+
+  createSendToken(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // the req.user.id comes through the protect route
+  const user = await User.findById(req.user.id).select("+password");
+
+  // passwordCurrent is the one that user input when enter this route and we compare it with the one in DB
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your current password is incorrect", 401));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save(); // dont use User.findByIdAndUpdate cuz it will not check for validate in userModel
 
   createSendToken(user, 200, res);
 });
