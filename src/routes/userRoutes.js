@@ -15,4 +15,11 @@ router.get(
   authController.restricTo("admin"),
   userController.getAllUsers
 );
+
+router.delete(
+  "/:id",
+  authController.protect,
+  authController.restricTo("admin"),
+  userController.deleteUser
+);
 module.exports = router;
