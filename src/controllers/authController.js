@@ -43,6 +43,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) If everythingok, send the token to the client
   createSendToken(user, 200, res);
 });
+
 exports.protect = async (req, res, next) => {
   // 1) Getting token and check of it's there
   // console.log(req.headers.authorization)
@@ -99,3 +100,12 @@ exports.protect = async (req, res, next) => {
     }
   }
 };
+
+exports.restricTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError("You don't have permission", 403));
+    }
+    next();
+  };
