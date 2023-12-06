@@ -115,4 +115,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError("There is no user with email address", 404));
   }
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false }); // deactivate all the validator in user the schema so that it's not gonna ask to confirm the password.
 });
