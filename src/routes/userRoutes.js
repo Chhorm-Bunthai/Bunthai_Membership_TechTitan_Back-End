@@ -7,5 +7,12 @@ const router = express.Router();
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 
-router.get("/users", authController.protect, userController.getAllUsers);
+router.post("/login", authController.login);
+
+router.get(
+  "/users",
+  authController.protect,
+  authController.restricTo("admin"),
+  userController.getAllUsers
+);
 module.exports = router;
