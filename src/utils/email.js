@@ -10,5 +10,10 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-
-}
+  const mailOptions = {
+    from: "Sun sun <sun@test.com>",
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+  };
+};
