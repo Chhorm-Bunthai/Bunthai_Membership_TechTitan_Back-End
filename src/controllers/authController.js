@@ -29,7 +29,7 @@ exports.signup = catchAsync(async (req, res) => {
   createSendToken(newUser, 201, res);
 });
 
-exports.login = async (req, res, next) => {
+exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   // 1) check if email and password exist
   if (!email || !password) {
@@ -42,7 +42,7 @@ exports.login = async (req, res, next) => {
   }
   // 3) If everythingok, send the token to the client
   createSendToken(user, 200, res);
-};
+});
 exports.protect = async (req, res, next) => {
   // 1) Getting token and check of it's there
   // console.log(req.headers.authorization)
