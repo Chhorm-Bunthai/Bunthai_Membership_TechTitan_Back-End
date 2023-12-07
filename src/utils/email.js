@@ -11,10 +11,10 @@ const sendEmail = async (options) => {
     },
   });
   const mailOptions = {
-    from: "Sun sun <sun@test.com>",
+    from: process.env.EMAIL_USERNAME,
     to: options.email,
     subject: options.subject,
-    text: options.message,
+    html: options.message,
   };
   await transporter.sendMail(mailOptions);
 };
