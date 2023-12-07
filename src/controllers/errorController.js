@@ -1,5 +1,15 @@
 const AppError = require("../utils/appError");
 
+// for mongoose validation
+const handleValidationErrorDB = (err) => {
+  // get every error object
+  const errors = Object.values(err.errors).map((el) => el.message);
+
+  const message = `Invalid input data. ${errors.join(". ")}`;
+  return new AppError(message, 400);
+};
+
+// for duplicate field
 const handleDuplicateFieldsDB = (err) => {
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
   const message = `Duplicate field value ${value}`;
@@ -49,6 +59,8 @@ module.exports = (err, req, res, next) => {
 
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (error.name === "ValidationError")
+      error = handleValidationErrorDB(error);
 
     sendErrorProd(error, res);
   }
