@@ -1,4 +1,5 @@
 const express = require("express");
+// eslint-disable-next-line import/no-extraneous-dependencies
 const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
@@ -12,8 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
   origin: process.env.CLIENT_URL,
-  methods: "GET,POST,PATCH,PUT,DELETE,HEAD",
-  credential: true,
+  // origin: "*",
+  methods: "GET, POST, PUT, PATCH, DELETE, HEAD",
+  credentials: true, // allow cookies to be sent
 };
 
 app.use(cors(corsOptions));
