@@ -19,7 +19,7 @@ router.patch(
 router.get(
   "/users",
   authController.protect,
-  authController.restricTo("admin"),
+  // authController.restricTo("admin"),
   userController.getAllUsers
 );
 router.delete(

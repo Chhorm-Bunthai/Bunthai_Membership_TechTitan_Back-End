@@ -174,3 +174,24 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 200, res);
 });
+
+exports.logout = (req, res) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 1,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Logged out",
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "failed",
+      message: "failed to log out",
+    });
+  }
+};
