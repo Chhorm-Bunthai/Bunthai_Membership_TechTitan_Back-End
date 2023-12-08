@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const cors = require("cors");
 
@@ -7,6 +8,9 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 
 const app = express();
+
+// Secure HTTP headers
+app.use(helmet());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
