@@ -15,16 +15,18 @@ const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   user.password = undefined;
 
-  res.cookie("jwt", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-  });
+  // set cookie from backend
+  // res.cookie("jwt", token, {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "None",
+  //   maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  // });
 
   res.status(statusCode).json({
     status: "success",
     data: {
+      token, // set it to frontend
       user,
     },
   });
