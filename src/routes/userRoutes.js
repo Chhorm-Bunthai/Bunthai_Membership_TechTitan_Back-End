@@ -29,3 +29,5 @@ router.delete(
   userController.deleteUser
 );
 module.exports = router;
+
+router.get("/me", authController.protect, userController.queryMe);

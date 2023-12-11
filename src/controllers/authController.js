@@ -11,7 +11,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, res, req) => {
   const token = signToken(user._id);
   user.password = undefined;
 
@@ -22,7 +22,9 @@ const createSendToken = (user, statusCode, res) => {
   //   sameSite: "None",
   //   maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
   // });
-
+  if (token) {
+    res.setHeader("Authorization", `Bearer ${token}`);
+  }
   res.status(statusCode).json({
     status: "success",
     data: {
