@@ -9,6 +9,10 @@ const sendEmail = async (options) => {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
     },
+    // This is used for make it not spam when sending email
+    tls: {
+      rejectUnauthorized: false
+    }
   });
   const mailOptions = {
     from: process.env.EMAIL_USERNAME,
