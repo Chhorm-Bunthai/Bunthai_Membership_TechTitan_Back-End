@@ -14,14 +14,6 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, res, req) => {
   const token = signToken(user._id);
   user.password = undefined;
-
-  // set cookie from backend
-  // res.cookie("jwt", token, {
-  //   httpOnly: true,
-  //   secure: true,
-  //   sameSite: "None",
-  //   maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-  // });
   if (token) {
     res.setHeader("Authorization", `Bearer ${token}`);
   }
@@ -113,96 +105,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // )}/api/users/resetPassword/${resetToken}`;
 
   const resetURL = `${req.protocol}://localhost:5173/resetPassword/${resetToken}`;
-
-  const message = `
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Password Reset</title>
-<style>
-  body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f2f2f2;
-  }
-  .header {
-    background-color: #fff;
-    padding: 10px 20px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-  }
-  .logo {
-    width: 100px; /* Adjust as per your logo's dimensions */
-  }
-  .container {
-    background-color: #fff;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  .title {
-    color: #333;
-    font-size: 26px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .content {
-    line-height: 1.5;
-    color: #666;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  .button {
-  background-color: #008CBA; /* Blue */
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 20px;
-  display: inline-block;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-  .footer {
-    text-align: center;
-    color: #999;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-  }
-</style>
-</head>
-<body>
-
-
-<div class="container">
-  <div class="title">
-    Reset your password
-  </div>
-
-  <div class="content">
-    <p>${user.name}</p>
-    <p>We're sending you this email because you requested a password reset. Click on this link to create a new password:</p>
-    <a href="${resetURL}" class="button">Change password</a>
-    <p>If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
-  </div>
-
-  <div class="footer">
-    Thank you for using the app.
-  </div>
-</div>
-
-</body>
-</html>
-`;
   try {
     await sendEmail({
       email: user.email,
+      user: user.name,
       submit: "Your password reset token (valid for 10mins)",
       subject: "Verification link",
-      message,
+      resetURL,
     });
     res.status(200).json({
       status: "success",
