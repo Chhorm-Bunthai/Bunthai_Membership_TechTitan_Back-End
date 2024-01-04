@@ -20,8 +20,8 @@ const corsOptions = {
   // origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, HEAD",
   credentials: true, // allow cookies to be sent
-  allowedHeaders: 'Content-Type, Authorization', // Specify allowed headers
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  allowedHeaders: "Content-Type, Authorization", // Specify allowed headers
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 app.use(cors(corsOptions));

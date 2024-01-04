@@ -14,6 +14,7 @@ const sendEmail = async (options) => {
       rejectUnauthorized: false,
     },
   });
+  console.log(options);
   const mailOptions = {
     from: process.env.EMAIL_USERNAME,
     to: options.email,
@@ -61,15 +62,22 @@ const sendEmail = async (options) => {
       text-align: center;
     }
     .button {
-    background-color: #008CBA; /* Blue */
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 20px;
-    display: inline-block;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
+      background-color: #004A7F;
+      color: white !important;
+      font-family: 'Arial', sans-serif;
+      font-size: 16px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .button:hover {
+      background-color: #003559; /* A darker shade of the button color for hover effect */
+    }
     .footer {
       text-align: center;
       color: #999;
@@ -83,20 +91,20 @@ const sendEmail = async (options) => {
   
   <div class="container">
     <div class="title">
-      Reset your password
+      Tech TITAN
     </div>
   
     <div class="content">
-      <p>${options.user}</p>
-      <p>We're sending you this email because you requested a password reset. Click on this link to create a new password:</p>
-      <a href="${options.resetURL}" class="button">Change password</a>
+      <p>Hi! ${options.user}</p>
+      <h3>${options.message}</h3>
+      <a href="${options.url}" class="button">${options.button}</a>
       <p>If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
     </div>
   
     <div class="footer">
       Thank you for using the app.
     </div>
-  </div>
+  </div>  
   
   </body>
   </html>

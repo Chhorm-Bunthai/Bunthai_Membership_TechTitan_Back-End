@@ -48,6 +48,10 @@ const userSchema = new Schema({
     default: true,
     select: false,
   },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,

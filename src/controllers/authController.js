@@ -11,7 +11,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, res, req) => {
+const createSendToken = async (user, statusCode, res, req) => {
   const token = signToken(user._id);
   user.password = undefined;
   if (token) {
@@ -32,9 +32,51 @@ exports.signup = catchAsync(async (req, res) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
-  createSendToken(newUser, 201, res);
+  const token = signToken(newUser._id);
+  const url = `${process.env.BASE_URL}/api/users/${newUser._id}/verify/${token}`;
+  const message = "Please Click button Below ro verify your account";
+  const notSeenEmail =
+    "If you cannot verify this, please contact us: bunthaicambo89@gmail.com";
+  try {
+    await sendEmail({
+      email: newUser.email,
+      user: newUser.name,
+      subject: "verify link",
+      url,
+      button: "Verify",
+      message,
+      notSeenEmail,
+    });
+    createSendToken(newUser, 201, res);
+  } catch (err) {
+    await newUser.save({ validateBeforeSave: false }); // save all modified data
+    // eslint-disable-next-line no-undef
+    return next(
+      new AppError(
+        "There was an error sending the email. Try again later!",
+        500
+      )
+    );
+  }
 });
-
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { verify: true },
+    { new: true } // Returns the updated document
+  );
+  if (!updatedUser) {
+    return next(new AppError("Internal Server Error", 500));
+  }
+  if (updatedUser) {
+    res.redirect(`${process.env.CLIENT_URL}/verifyEmail`);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "User's email verify successfully.",
+    updatedUser,
+  });
+});
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   // 1) check if email and password exist
@@ -45,6 +87,10 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
+  }
+
+  if (!user.verify) {
+    return next(new AppError("User is not verified yet!", 403));
   }
   // 3) If everythingok, send the token to the client
   createSendToken(user, 200, res);
@@ -100,25 +146,28 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false }); // deactivate all the validator in user the schema so that it's not gonna ask to confirm the password.
-  // const resetURL = `${req.protocol}://${req.get(
-  //   "host"
-  // )}/api/users/resetPassword/${resetToken}`;
 
   const resetURL = `${req.protocol}://localhost:5173/resetPassword/${resetToken}`;
+  const message =
+    "We're sending you this email because you requested a password reset. Click on this link to create a new password:";
+  const notSeenEmail =
+    "If you didn't get a password reset, you can ignore this email. Your password will not be changed.";
   try {
     await sendEmail({
       email: user.email,
       user: user.name,
       submit: "Your password reset token (valid for 10mins)",
-      subject: "Verification link",
-      resetURL,
+      subject: "Reset password link",
+      url: resetURL,
+      button: "Reset Password",
+      message,
+      notSeenEmail,
     });
     res.status(200).json({
       status: "success",
       message: "Token sent to email!!!",
     });
   } catch (err) {
-    console.log(err);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false }); // save all modified data
