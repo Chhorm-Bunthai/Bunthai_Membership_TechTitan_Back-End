@@ -157,15 +157,15 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     text-align: center;
   }
   .button {
-    background-color: #e60023;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 20px;
-    display: inline-block;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
+  background-color: #008CBA; /* Blue */
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: bold;
+  text-transform: uppercase;
+}
   .footer {
     text-align: center;
     color: #999;
@@ -183,9 +183,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   </div>
 
   <div class="content">
-    <p>${user["name"]}</p>
+    <p>${user.name}</p>
     <p>We're sending you this email because you requested a password reset. Click on this link to create a new password:</p>
-    <a href="${resetURL}" class="button">Set a new password</a>
+    <a href="${resetURL}" class="button">Change password</a>
     <p>If you didn't request a password reset, you can ignore this email. Your password will not be changed.</p>
   </div>
 
@@ -201,7 +201,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await sendEmail({
       email: user.email,
       submit: "Your password reset token (valid for 10mins)",
-      subject:"Verification link",
+      subject: "Verification link",
       message,
     });
     res.status(200).json({
