@@ -3,6 +3,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+.vscode
 
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100
@@ -86,7 +87,6 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
