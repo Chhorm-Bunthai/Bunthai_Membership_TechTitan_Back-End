@@ -23,7 +23,7 @@ Membership and authentication are the bedrock of user engagement and security in
 # Installation
 ## Clone to local Machine
 > git clone https://github.com/anb-hq/Bunthai_Membership_TechTitan_Back-End.git <br>
-> npm install 
+> npm install <br>
 > npm start <br>
 
 # My Git flow Strategy
